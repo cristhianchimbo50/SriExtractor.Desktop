@@ -21,44 +21,54 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Padding="12" Margin="0,0,0,10" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
-            <StackPanel>
-                <UniformGrid Columns="2" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Proveedor" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtProveedor" FontSize="14" TextWrapping="Wrap"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="N° Factura" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtFactura" FontSize="14"/>
-                    </StackPanel>
-                </UniformGrid>
-                <UniformGrid Columns="6" Margin="0,0,0,0">
-                    <StackPanel>
-                        <TextBlock Text="N° Compra" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtCompra" FontSize="14"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="N° Retención" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtRetencion" FontSize="14"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Subtotal" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtSubtotal" FontSize="14"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="IVA" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtIva" FontSize="14"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Base 15%" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtBase15" FontSize="14"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Text="Total" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="TxtTotal" FontSize="14"/>
-                    </StackPanel>
-                </UniformGrid>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,12,8">
+                    <TextBlock Text="Proveedor:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtProveedor" FontSize="14" TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="N° Factura:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtFactura" FontSize="14"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,0,12,8">
+                    <TextBlock Text="N° Compra:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtCompra" FontSize="14"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="N° Retención:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtRetencion" FontSize="14"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,0,12,8">
+                    <TextBlock Text="Subtotal:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtSubtotal" FontSize="14"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="IVA:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtIva" FontSize="14"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="Base 15%:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtBase15" FontSize="14"/>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Total:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="TxtTotal" FontSize="14"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="1" Padding="12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
