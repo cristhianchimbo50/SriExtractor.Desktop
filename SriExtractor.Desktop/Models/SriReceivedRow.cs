@@ -26,5 +26,25 @@ public class SriReceivedRow
 
     public string CoNumeroDisplay => string.IsNullOrWhiteSpace(CoNumero) ? "SIN REGISTRO" : CoNumero;
 
-    public string PmNrosecDisplay => string.IsNullOrWhiteSpace(PmNrosec) ? "SIN REGISTRO" : PmNrosec;
+    public string PmNrosecDisplay
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(PmNrosec))
+                return "SIN REGISTRO";
+
+            if (string.Equals(PmNrosec, "GRAN CONTRIBUYENTE", StringComparison.OrdinalIgnoreCase))
+                return PmNrosec;
+
+            var cleaned = PmNrosec.Trim();
+            if (cleaned.All(char.IsDigit))
+            {
+                var padded = cleaned.PadLeft(9, '0');
+                if (string.CompareOrdinal(padded, "000001600") < 0)
+                    return "NO VALIDADA";
+            }
+
+            return PmNrosec;
+        }
+    }
 }

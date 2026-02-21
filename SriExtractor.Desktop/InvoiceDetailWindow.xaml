@@ -108,7 +108,7 @@
                 </DataGrid>
             </Border>
 
-            <Border Padding="12" Margin="0,12,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+            <Border Padding="12" Margin="0,12,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1" Width="462" HorizontalAlignment="Right">
                 <DataGrid x:Name="GridTotals"
                           AutoGenerateColumns="False"
                           HeadersVisibility="None"
