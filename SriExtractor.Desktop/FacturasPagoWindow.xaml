@@ -28,7 +28,8 @@
                   Grid.Row="1"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  CanUserAddRows="False">
+                  CanUserAddRows="False"
+                  CanUserSortColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="CO_NUMERO" Binding="{Binding CoNumero}" Width="110"/>
                 <DataGridTextColumn Header="PM_NROSEC" Binding="{Binding PmNrosec}" Width="110"/>

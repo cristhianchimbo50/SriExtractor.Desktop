@@ -14,5 +14,12 @@ public class SriInvoiceHeader
     public DateTime FechaEmision { get; set; }
     public decimal Total { get; set; }
 
+    public decimal Subtotal15 { get; set; }
+    public decimal SubtotalNoObjetoIva { get; set; }
+    public decimal SubtotalExentoIva { get; set; }
+    public decimal SubtotalSinImpuestos { get; set; }
+    public decimal TotalDescuento { get; set; }
+    public decimal Iva15 { get; set; }
+
     public string XmlPath { get; set; } = "";
 }

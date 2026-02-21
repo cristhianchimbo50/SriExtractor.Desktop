@@ -47,6 +47,42 @@ public static class SriXmlParser
         var totalStr = infoFactura?.Element("importeTotal")?.Value ?? "0";
         var total = ParseDec(totalStr);
 
+        var totalSinImpuestos = ParseDec(infoFactura?.Element("totalSinImpuestos")?.Value ?? "0");
+        var totalDescuento = ParseDec(infoFactura?.Element("totalDescuento")?.Value ?? "0");
+
+        decimal subtotal15 = 0;
+        decimal subtotalNoObjetoIva = 0;
+        decimal subtotalExentoIva = 0;
+        decimal iva15 = 0;
+
+        var totalImpuestos = infoFactura?.Descendants("totalImpuesto") ?? Enumerable.Empty<XElement>();
+        foreach (var imp in totalImpuestos)
+        {
+            var codigo = imp.Element("codigo")?.Value ?? "";
+            var codigoPorcentaje = imp.Element("codigoPorcentaje")?.Value ?? "";
+            var tarifa = ParseDec(imp.Element("tarifa")?.Value ?? "0");
+
+            var baseImp = ParseDec(imp.Element("baseImponible")?.Value ?? "0");
+            var valor = ParseDec(imp.Element("valor")?.Value ?? "0");
+
+            if (codigo == "2")
+            {
+                if (codigoPorcentaje == "4" || tarifa == 15)
+                {
+                    subtotal15 += baseImp;
+                    iva15 += valor;
+                }
+                else if (codigoPorcentaje == "6")
+                {
+                    subtotalNoObjetoIva += baseImp;
+                }
+                else if (codigoPorcentaje == "7")
+                {
+                    subtotalExentoIva += baseImp;
+                }
+            }
+        }
+
         var header = new SriInvoiceHeader
         {
             XmlPath = xmlPath,
@@ -58,7 +94,13 @@ public static class SriXmlParser
             NombreComercialEmisor = nombreComercial,
             NumeroFactura = numeroFactura,
             FechaEmision = fechaEmision,
-            Total = total
+            Total = total,
+            Subtotal15 = subtotal15,
+            SubtotalNoObjetoIva = subtotalNoObjetoIva,
+            SubtotalExentoIva = subtotalExentoIva,
+            SubtotalSinImpuestos = totalSinImpuestos,
+            TotalDescuento = totalDescuento,
+            Iva15 = iva15
         };
 
         var items = new List<SriInvoiceItem>();

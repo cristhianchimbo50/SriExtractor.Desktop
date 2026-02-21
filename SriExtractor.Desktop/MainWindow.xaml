@@ -109,6 +109,7 @@
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserAddRows="False"
+                  CanUserSortColumns="False"
                   CanUserResizeColumns="False"
                   CanUserResizeRows="False"
                   ItemsSource="{Binding Rows}">

@@ -33,6 +33,7 @@
             <DataGrid x:Name="GridProveedores"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
+                      CanUserSortColumns="False"
                       CanUserAddRows="False"
                       CanUserResizeColumns="False"
                       CanUserResizeRows="False">
