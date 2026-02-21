@@ -1,0 +1,108 @@
+﻿<Window x:Class="SriExtractor.Desktop.InvoiceDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Detalle de factura"
+        Height="720"
+        Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource PageBackground}">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PageBackground" Color="#FFF4F5F7"/>
+        <SolidColorBrush x:Key="CardBackground" Color="White"/>
+        <SolidColorBrush x:Key="BorderBrushLight" Color="#FFCED4DA"/>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource PageBackground}">
+        <StackPanel Margin="16" Background="{StaticResource PageBackground}">
+
+            <Border Padding="12" Margin="0,0,0,12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Razón social / Nombres y Apellidos:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtRazonSocial" Grid.Column="1" TextWrapping="Wrap" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="1" Text="Nombre comercial:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtNombreComercial" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="2" Text="RUC:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtRuc" Grid.Row="2" Grid.Column="1" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="3" Text="Número de factura:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtFactura" Grid.Row="3" Grid.Column="1" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="4" Text="Fecha de emisión:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtFechaEmision" Grid.Row="4" Grid.Column="1" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="5" Text="Total:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtTotal" Grid.Row="5" Grid.Column="1" FontWeight="SemiBold" Margin="10,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <Border Padding="12" Margin="0,0,0,12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Número de autorización:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtAutorizacion" Grid.Column="1" TextWrapping="Wrap" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="1" Text="Fecha y hora de autorización:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtFechaAutorizacion" Grid.Row="1" Grid.Column="1" Margin="10,0,0,6"/>
+
+                    <TextBlock Grid.Row="2" Text="Clave de acceso:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="TxtClave" Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Margin="10,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <Border Padding="12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+                <DataGrid
+                      x:Name="GridItems"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserResizeColumns="False"
+                      CanUserResizeRows="False"
+                      SelectionUnit="Cell"
+                      SelectionMode="Single"
+                      Language="en-US">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Cod. Principal" Binding="{Binding CodigoPrincipal}" Width="120"/>
+                        <DataGridTextColumn Header="Cod. Auxiliar" Binding="{Binding CodigoAuxiliar}" Width="110"/>
+                        <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, StringFormat=0.##, ConverterCulture=en-US}" Width="90"/>
+                        <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="P. Unitario" Binding="{Binding PrecioUnitario, StringFormat=0.##, ConverterCulture=en-US}" Width="110"/>
+                        <DataGridTextColumn Header="Desc." Binding="{Binding Descuento, StringFormat=0.##, ConverterCulture=en-US}" Width="80"/>
+                        <DataGridTextColumn Header="P. Unit c/desc" Binding="{Binding PrecioUnitarioConDescuento, StringFormat=0.##, ConverterCulture=en-US}" Width="130"/>
+                        <DataGridTextColumn Header="Subtotal" Binding="{Binding TotalLinea, StringFormat=0.##, ConverterCulture=en-US}" Width="110"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
