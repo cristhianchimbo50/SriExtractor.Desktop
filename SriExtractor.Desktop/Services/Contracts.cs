@@ -12,6 +12,7 @@ public interface IOracleProveedorService
 public interface IOracleFacturaPagoService
 {
     List<FacturaPagoRow> GetFacturasPago();
+    List<RetencionDetalleRow> GetRetencionDetalle(string coNumero);
 }
 
 public interface ISriRecibidosService

@@ -1,5 +1,9 @@
-﻿using SriExtractor.Desktop.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SriExtractor.Desktop.Infrastructure;
+using SriExtractor.Desktop.Models;
 using SriExtractor.Desktop.Services;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,17 +16,31 @@ namespace SriExtractor.Desktop;
 
 public partial class InvoiceDetailWindow : Window
 {
-    public InvoiceDetailWindow(string xmlPath)
+    private readonly string _xmlPath;
+    private readonly string _coNumero;
+    private readonly string _proveedorNombre;
+    private readonly string _numeroFactura;
+    private readonly IOracleFacturaPagoService _facturaPagoService;
+
+    public InvoiceDetailWindow(SriReceivedRow row)
     {
         InitializeComponent();
         GridItems.PreviewKeyDown += GridItems_PreviewKeyDown;
-        LoadXml(xmlPath);
+
+        _xmlPath = row.XmlPath;
+        _coNumero = row.CoNumero;
+        _proveedorNombre = row.RazonSocialEmisor;
+        _numeroFactura = row.NumeroFactura;
+
+        _facturaPagoService = AppHost.Services.GetRequiredService<IOracleFacturaPagoService>();
+
+        LoadXml();
     }
 
-    private void LoadXml(string xmlPath)
+    private void LoadXml()
     {
-        var xmlContent = File.ReadAllText(xmlPath);
-        var (header, items) = SriXmlParser.ParseFacturaAutorizada(xmlContent, xmlPath);
+        var xmlContent = File.ReadAllText(_xmlPath);
+        var (header, items) = SriXmlParser.ParseFacturaAutorizada(xmlContent, _xmlPath);
 
         var groupedItems = items
             .GroupBy(i => NormalizeCodeKey(i))
@@ -54,6 +72,43 @@ public partial class InvoiceDetailWindow : Window
             new { Label = "IVA 15%", Value = header.Iva15 },
             new { Label = "VALOR TOTAL", Value = header.Total }
         };
+    }
+
+    private bool HasCoNumero()
+    {
+        return !string.IsNullOrWhiteSpace(_coNumero) &&
+               !string.Equals(_coNumero, "SIN REGISTRO", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void BtnVerRetencion_Click(object sender, RoutedEventArgs e)
+    {
+        if (!HasCoNumero())
+        {
+            MessageBox.Show("Compra no registrada.", "Ver compra", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            var data = _facturaPagoService.GetRetencionDetalle(_coNumero);
+
+            if (data.Count == 0)
+            {
+                MessageBox.Show("Compra no registrada.", "Ver compra", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var win = new RetencionDetalleWindow(_coNumero, data, _proveedorNombre, _numeroFactura)
+            {
+                Owner = this
+            };
+
+            win.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error al obtener la compra: " + ex.Message, "Ver compra", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private static string NormalizeCodeKey(SriInvoiceItem item)

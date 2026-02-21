@@ -37,7 +37,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var win = new InvoiceDetailWindow(row.XmlPath);
+        var win = new InvoiceDetailWindow(row);
         win.Show();
     }
 

@@ -134,7 +134,9 @@
                     <DataGridTemplateColumn Header="Ver" Width="70">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Ver" Width="55" Height="26" Click="BtnView_Click"/>
+                                <Button Width="55" Height="26" Click="BtnView_Click" FontFamily="Segoe MDL2 Assets">
+                                    <TextBlock Text="&#xE8A0;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

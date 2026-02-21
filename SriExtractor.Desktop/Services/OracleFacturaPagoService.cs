@@ -1,6 +1,8 @@
 using Oracle.ManagedDataAccess.Client;
 using SriExtractor.Desktop.Models;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace SriExtractor.Desktop.Services;
 
@@ -72,5 +74,89 @@ ORDER BY M.CO_NUMERO DESC";
         }
 
         return list;
+    }
+
+    public List<RetencionDetalleRow> GetRetencionDetalle(string coNumero)
+    {
+        var list = new List<RetencionDetalleRow>();
+
+        if (string.IsNullOrWhiteSpace(coNumero))
+            return list;
+
+        const string query = @"SELECT
+    C.CO_NUMERO,
+    P.PM_NROSEC,
+    C.CO_SUBTOT,
+    C.CO_IVA,
+    C.CO_TARIFA12,
+    C.CO_TOTAL,
+
+    I.CL_CODIGO,
+    I.IT_CODIGO,
+    I.IT_NOMBRE,
+    D.DC_CANTID,
+    D.DC_COSTO,
+    (D.DC_CANTID * D.DC_COSTO) AS LINEA_SUBTOTAL
+
+FROM IN_COMPRA C,
+     CP_MOVIM M,
+     CP_PAGO P,
+     IN_DETCO  D,
+     IN_ITEM   I
+WHERE C.CO_NUMERO = D.CO_NUMERO
+  AND D.IT_CODIGO = I.IT_CODIGO
+  AND M.CO_NUMERO = C.CO_NUMERO
+  AND P.MP_CODIGO = M.MP_CODIGO
+  AND C.CO_NUMERO = :coNumero
+ORDER BY D.IT_CODIGO";
+
+        using var connection = new OracleConnection(_connectionString);
+        connection.Open();
+
+        using var command = new OracleCommand(query, connection);
+        command.Parameters.Add(new OracleParameter("coNumero", coNumero));
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            var itCodigo = reader["IT_CODIGO"]?.ToString()?.Trim() ?? "";
+            var clCodigo = reader["CL_CODIGO"]?.ToString()?.Trim() ?? "";
+
+            list.Add(new RetencionDetalleRow
+            {
+                CoNumero = reader["CO_NUMERO"]?.ToString()?.Trim() ?? "",
+                PmNrosec = reader["PM_NROSEC"]?.ToString()?.Trim() ?? "",
+                ClCodigo = clCodigo,
+                ItCodigo = itCodigo,
+                CodigoProducto = itCodigo,
+                Producto = reader["IT_NOMBRE"]?.ToString()?.Trim() ?? "",
+                Cantidad = GetDecimal(reader, "DC_CANTID"),
+                CostoUnitario = GetDecimal(reader, "DC_COSTO"),
+                SubtotalLinea = GetDecimal(reader, "LINEA_SUBTOTAL"),
+                Subtotal = GetDecimal(reader, "CO_SUBTOT"),
+                Iva = GetDecimal(reader, "CO_IVA"),
+                Base15 = GetDecimal(reader, "CO_TARIFA12"),
+                Total = GetDecimal(reader, "CO_TOTAL")
+            });
+        }
+
+        return list;
+    }
+
+    private static decimal GetDecimal(OracleDataReader reader, string column)
+    {
+        var value = reader[column];
+        if (value == null || value == DBNull.Value)
+            return 0;
+
+        try
+        {
+            return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+        }
+        catch
+        {
+            return 0;
+        }
     }
 }
