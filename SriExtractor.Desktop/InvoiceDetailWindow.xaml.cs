@@ -61,6 +61,7 @@ public partial class InvoiceDetailWindow : Window
         TxtClave.Text = header.ClaveAcceso;
 
         GridItems.ItemsSource = groupedItems;
+        AdjustGridItemsHeight(groupedItems.Count);
 
         GridTotals.ItemsSource = new[]
         {
@@ -72,6 +73,22 @@ public partial class InvoiceDetailWindow : Window
             new { Label = "IVA 15%", Value = header.Iva15 },
             new { Label = "VALOR TOTAL", Value = header.Total }
         };
+    }
+
+    private void AdjustGridItemsHeight(int rowCount)
+    {
+        if (GridItems == null) return;
+
+        if (rowCount > 10)
+        {
+            double rowHeight = GridItems.RowHeight > 0 ? GridItems.RowHeight : 25;
+            double headerHeight = double.IsNaN(GridItems.ColumnHeaderHeight) ? 25 : GridItems.ColumnHeaderHeight;
+            GridItems.Height = headerHeight + (rowHeight * 10) + 4;
+        }
+        else
+        {
+            GridItems.Height = double.NaN; // auto
+        }
     }
 
     private bool HasCoNumero()
