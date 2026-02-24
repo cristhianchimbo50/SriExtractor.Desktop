@@ -95,6 +95,10 @@
                 <Button Content="Facturas BD"
                         Width="130" Height="38"
                         Click="BtnOpenFacturasBd_Click"/>
+
+                <Button Content="Desactivados"
+                    Width="130" Height="38"
+                    Click="BtnOpenDisabledProviders_Click"/>
             </StackPanel>
         </Border>
 
@@ -165,6 +169,14 @@
                   CanUserResizeColumns="False"
                   CanUserResizeRows="False"
                   ItemsSource="{Binding Rows}">
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu Opened="GridRecibidos_ContextMenuOpened">
+                        <MenuItem x:Name="MiToggleProveedor"
+                  Header="Desactivar proveedor"
+                  Click="MiToggleProveedor_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
                         <Style.Triggers>

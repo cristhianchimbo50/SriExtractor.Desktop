@@ -1,8 +1,8 @@
 using SriExtractor.Desktop.Configuration;
 using SriExtractor.Desktop.Models;
 using SriExtractor.Desktop.Services;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -22,6 +22,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IOracleFacturaPagoService _facturaPagoService;
     private readonly IStoragePathProvider _storagePathProvider;
     private readonly Func<ISriSessionService> _sriSessionFactory;
+    private readonly DisabledProvidersStore _disabledStore;
 
     private ISriSessionService? _sriSession;
     private HashSet<string> _proveedoresRuc = new(StringComparer.OrdinalIgnoreCase);
@@ -96,7 +97,8 @@ public class MainViewModel : INotifyPropertyChanged
         IOracleProveedorService proveedorService,
         IOracleFacturaPagoService facturaPagoService,
         IStoragePathProvider storagePathProvider,
-        Func<ISriSessionService> sriSessionFactory)
+        Func<ISriSessionService> sriSessionFactory,
+        DisabledProvidersStore disabledStore)
     {
         _settings = settings;
         _recibidosService = recibidosService;
@@ -104,6 +106,7 @@ public class MainViewModel : INotifyPropertyChanged
         _facturaPagoService = facturaPagoService;
         _storagePathProvider = storagePathProvider;
         _sriSessionFactory = sriSessionFactory;
+        _disabledStore = disabledStore;
 
         var now = DateTime.Now;
         YearOptions = Enumerable.Range(now.Year - 3, 7).ToList();
@@ -179,12 +182,17 @@ public class MainViewModel : INotifyPropertyChanged
 
             var data = await _recibidosService.DownloadAllByDateAsync(storagePath, date.year, date.month, date.day);
 
+            data = data
+                .Where(r => !_disabledStore.IsDisabled(r.RucEmisor))
+                .ToList();
+
             await CargarProveedoresAsync();
             await CargarFacturasBdAsync();
 
             foreach (var r in data)
             {
                 r.ProveedorExiste = ProveedorExiste(r.RucEmisor);
+
                 var numeroSinGuiones = (r.NumeroFactura ?? "").Replace("-", "");
                 var match = _facturasBd.FirstOrDefault(f => string.Equals(f.CoFacpro, numeroSinGuiones, StringComparison.OrdinalIgnoreCase));
 
@@ -249,6 +257,9 @@ public class MainViewModel : INotifyPropertyChanged
                 {
                     var xml = await File.ReadAllTextAsync(file);
                     var parsed = SriXmlParser.ParseFacturaAutorizada(xml, file).header;
+
+                    if (_disabledStore.IsDisabled(parsed.RucEmisor))
+                        continue;
 
                     result.Add(new SriReceivedRow
                     {

@@ -9,18 +9,21 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SriExtractor.Desktop.Services;
 
 namespace SriExtractor.Desktop;
 
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _vm;
+    private readonly DisabledProvidersStore _disabledStore;
 
     public MainWindow()
     {
         InitializeComponent();
         var sp = AppHost.Services;
         _vm = sp.GetRequiredService<MainViewModel>();
+        _disabledStore = sp.GetRequiredService<DisabledProvidersStore>();
         _vm.DownloadCompleted += LoadFechasExtraidas;
         DataContext = _vm;
         LoadFechasExtraidas();
@@ -50,6 +53,62 @@ public partial class MainWindow : Window
     {
         var win = new FacturasPagoWindow();
         win.Show();
+    }
+
+    private void BtnOpenDisabledProviders_Click(object sender, RoutedEventArgs e)
+    {
+        var win = new DisabledProvidersWindow(_disabledStore);
+        win.Owner = this;
+        win.ShowDialog();
+        _ = _vm.LoadLocalAsync(_vm.SelectedYear, _vm.SelectedMonth, _vm.SelectedDay);
+    }
+
+    private void GridRecibidos_ContextMenuOpened(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (GridRecibidos.SelectedItem is not SriReceivedRow row)
+            {
+                MiToggleProveedor.IsEnabled = false;
+                return;
+            }
+
+            var ruc = (row.RucEmisor ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(ruc))
+            {
+                MiToggleProveedor.IsEnabled = false;
+                return;
+            }
+
+            var isDisabled = _disabledStore.IsDisabled(ruc);
+            MiToggleProveedor.IsEnabled = true;
+            MiToggleProveedor.Header = isDisabled ? "Activar proveedor" : "Desactivar proveedor";
+        }
+        catch
+        {
+            MiToggleProveedor.IsEnabled = false;
+        }
+    }
+
+    private void MiToggleProveedor_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (GridRecibidos.SelectedItem is not SriReceivedRow row)
+                return;
+
+            var ruc = (row.RucEmisor ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(ruc))
+                return;
+
+            var razon = (row.RazonSocialEmisor ?? "").Trim();
+            _disabledStore.Toggle(ruc, razon);
+
+            _ = _vm.LoadLocalAsync(_vm.SelectedYear, _vm.SelectedMonth, _vm.SelectedDay);
+        }
+        catch
+        {
+        }
     }
 
     private void LoadFechasExtraidas()

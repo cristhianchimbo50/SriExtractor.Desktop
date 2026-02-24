@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using SriExtractor.Desktop.Configuration;
 using SriExtractor.Desktop.Services;
 using SriExtractor.Desktop.ViewModels;
+using System;
+using System.IO;
 
 namespace SriExtractor.Desktop.Infrastructure;
 
@@ -30,6 +32,15 @@ public static class AppHost
         {
             var storage = sp.GetRequiredService<IStoragePathProvider>().GetStoragePath();
             return new SriSessionService(storage);
+        });
+
+        services.AddSingleton(sp =>
+        {
+            var file = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "SriExtractor",
+                "disabled_providers.xml");
+            return new DisabledProvidersStore(file);
         });
 
         services.AddSingleton<MainViewModel>();

@@ -14,6 +14,13 @@ public class SriRecibidosService : ISriRecibidosService
     private const string RecibidosUrl =
         "https://srienlinea.sri.gob.ec/comprobantes-electronicos-internet/pages/consultas/recibidos/comprobantesRecibidos.jsf?&contextoMPT=https://srienlinea.sri.gob.ec/tuportal-internet&pathMPT=Facturaci%F3n%20Electr%F3nica&actualMPT=Comprobantes%20electr%F3nicos%20recibidos%20&linkMPT=%2Fcomprobantes-electronicos-internet%2Fpages%2Fconsultas%2Frecibidos%2FcomprobantesRecibidos.jsf%3F&esFavorito=S";
 
+    private readonly DisabledProvidersStore _disabledStore;
+
+    public SriRecibidosService(DisabledProvidersStore disabledStore)
+    {
+        _disabledStore = disabledStore;
+    }
+
     public async Task<List<SriReceivedRow>> DownloadAllByDateAsync(string storageStatePath, int year, int month, int day)
     {
         var folder = GetXmlFolder(year, month, day);
@@ -65,6 +72,9 @@ public class SriRecibidosService : ISriRecibidosService
             var ruc = parts.Length > 0 ? parts[0] : "";
             var razon = parts.Length > 1 ? string.Join(" ", parts.Skip(1)) : "";
 
+            if (_disabledStore.IsDisabled(ruc))
+                continue;
+
             var clave = (await cells.Nth(3).InnerTextAsync()).Trim();
             var fechaEmi = (await cells.Nth(5).InnerTextAsync()).Trim();
 
@@ -88,6 +98,9 @@ public class SriRecibidosService : ISriRecibidosService
             if (existingByClave.ContainsKey(row.ClaveAcceso))
                 continue;
 
+            if (_disabledStore.IsDisabled(row.RucEmisor))
+                continue;
+
             var xmlLinkSelector = $"#frmPrincipal\\:tablaCompRecibidos\\:{row.RowIndex}\\:lnkXml";
 
             var download = await page.RunAndWaitForDownloadAsync(async () =>
@@ -100,6 +113,12 @@ public class SriRecibidosService : ISriRecibidosService
 
             var xmlContent = await File.ReadAllTextAsync(tempPath);
             var parsed = SriXmlParser.ParseFacturaAutorizada(xmlContent, tempPath).header;
+
+            if (_disabledStore.IsDisabled(parsed.RucEmisor))
+            {
+                File.Delete(tempPath);
+                continue;
+            }
 
             var finalPath = BuildFinalPath(folder, parsed.NumeroFactura, row.ClaveAcceso);
 
@@ -116,6 +135,9 @@ public class SriRecibidosService : ISriRecibidosService
             {
                 var xml = await File.ReadAllTextAsync(file);
                 var parsed = SriXmlParser.ParseFacturaAutorizada(xml, file).header;
+
+                if (_disabledStore.IsDisabled(parsed.RucEmisor))
+                    continue;
 
                 result.Add(new SriReceivedRow
                 {
@@ -187,10 +209,8 @@ public class SriRecibidosService : ISriRecibidosService
             }
             catch (PlaywrightException)
             {
-                // Fall through to retry.
             }
 
-            // Recargar y reintentar sin cerrar el navegador.
             await page.ReloadAsync(new PageReloadOptions { WaitUntil = WaitUntilState.NetworkIdle, Timeout = 60000 });
 
             if (IsLoginRedirect(page.Url))
