@@ -10,6 +10,8 @@ public class SriInvoiceItem
     public decimal PrecioUnitario { get; set; }
     public decimal Descuento { get; set; }
 
+    public decimal DescuentoUnitario { get; set; }
+
     public decimal BaseImponible { get; set; }
     public decimal Iva { get; set; }
     public decimal TotalLinea { get; set; }

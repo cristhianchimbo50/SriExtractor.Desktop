@@ -12,6 +12,58 @@
         <SolidColorBrush x:Key="PageBackground" Color="#FFF4F5F7"/>
         <SolidColorBrush x:Key="CardBackground" Color="White"/>
         <SolidColorBrush x:Key="BorderBrushLight" Color="#FFCED4DA"/>
+
+        <Style x:Key="CoNumeroCellStyle" TargetType="DataGridCell">
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CoNumeroDisplay}" Value="NO VALIDADA">
+                    <Setter Property="Background" Value="#FFFFD6D6"/>
+                </DataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding CoNumeroDisplay}" Value="SIN REGISTRO"/>
+                        <Condition Binding="{Binding ProveedorExiste}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFFFF2CC"/>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding CoNumeroDisplay}" Value="NO REGISTRADA"/>
+                        <Condition Binding="{Binding ProveedorExiste}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFFFF2CC"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PmNrosecCellStyle" TargetType="DataGridCell">
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PmNrosecDisplay}" Value="NO VALIDADA">
+                    <Setter Property="Background" Value="#FFFFD6D6"/>
+                </DataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding PmNrosecDisplay}" Value="SIN REGISTRO"/>
+                        <Condition Binding="{Binding ProveedorExiste}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFFFF2CC"/>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding PmNrosecDisplay}" Value="NO REGISTRADA"/>
+                        <Condition Binding="{Binding ProveedorExiste}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFFFF2CC"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="16" Background="{StaticResource PageBackground}">
@@ -128,8 +180,8 @@
                     <DataGridTextColumn Header="Proveedor" Binding="{Binding RazonSocialEmisor}" Width="*"/>
                     <DataGridTextColumn Header="N° Factura" Binding="{Binding NumeroFactura}" Width="160"/>
 
-                    <DataGridTextColumn Header="N° de compra" Binding="{Binding CoNumeroDisplay}" Width="120"/>
-                    <DataGridTextColumn Header="N° de retención" Binding="{Binding PmNrosecDisplay}" Width="130"/>
+                    <DataGridTextColumn Header="N° de compra" Binding="{Binding CoNumeroDisplay}" Width="120" CellStyle="{StaticResource CoNumeroCellStyle}"/>
+                    <DataGridTextColumn Header="N° de retención" Binding="{Binding PmNrosecDisplay}" Width="130" CellStyle="{StaticResource PmNrosecCellStyle}"/>
 
                     <DataGridTemplateColumn Header="Ver" Width="70">
                         <DataGridTemplateColumn.CellTemplate>
@@ -145,10 +197,17 @@
         </Border>
 
         <Border Grid.Row="3" Grid.Column="1" Padding="10" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1" Margin="12,0,0,51" Grid.RowSpan="4">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
                 <TextBlock Text="Fechas extraídas" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                <TreeView x:Name="TreeFechas" MouseDoubleClick="TreeFechas_MouseDoubleClick" />
-            </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <TreeView x:Name="TreeFechas" MouseDoubleClick="TreeFechas_MouseDoubleClick" />
+                </ScrollViewer>
+            </Grid>
         </Border>
 
         <Border Grid.Row="6" Grid.ColumnSpan="2" Margin="0,12,0,0" Padding="10">

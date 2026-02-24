@@ -7,8 +7,7 @@ public class RetencionDetalleRow
 {
     public string CoNumero { get; set; } = "";
     public string PmNrosec { get; set; } = "";
-    public string ClCodigo { get; set; } = "";
-    public string ItCodigo { get; set; } = "";
+    public string ItCodAnt { get; set; } = "";
     public decimal Subtotal { get; set; }
     public decimal Iva { get; set; }
     public decimal Base15 { get; set; }

@@ -84,8 +84,7 @@
                       SelectionUnit="Cell"
                       Language="en-US">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Cod. Producto" Binding="{Binding ClCodigo}" Width="140"/>
-                    <DataGridTextColumn Header="N° Producto" Binding="{Binding ItCodigo}" Width="130"/>
+                    <DataGridTextColumn Header="N° Producto" Binding="{Binding ItCodAnt}" Width="130"/>
                     <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

@@ -14,9 +14,9 @@
     </Window.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource PageBackground}">
-        <StackPanel Margin="16" Background="{StaticResource PageBackground}">
+        <StackPanel Margin="10" Background="{StaticResource PageBackground}">
 
-            <Border Padding="12" Margin="0,0,0,12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+            <Border Padding="5" Margin="0,0,0,5" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
                 <Grid Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="240"/>
@@ -51,7 +51,7 @@
                 </Grid>
             </Border>
 
-            <Border Padding="12" Margin="0,0,0,12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+            <Border Padding="5" Margin="0,0,0,10" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="240"/>
@@ -76,13 +76,13 @@
 
             <Button x:Name="BtnVerRetencion"
                     Content="Ver compra"
-                    Width="140"
-                    Height="32"
+                    Width="130"
+                    Height="25"
                     HorizontalAlignment="Right"
                     Margin="0,0,0,12"
                     Click="BtnVerRetencion_Click"/>
 
-            <Border Padding="12" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
+            <Border Padding="10" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1">
                 <StackPanel>
                     <DataGrid
                           x:Name="GridItems"
@@ -92,16 +92,17 @@
                           CanUserSortColumns="False"
                           CanUserResizeColumns="False"
                           CanUserResizeRows="False"
-                          SelectionUnit="Cell"
+                          SelectionUnit="FullRow"
                           SelectionMode="Single"
                           Language="en-US"
                           ClipboardCopyMode="ExcludeHeader"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          PreviewKeyDown="GridItems_PreviewKeyDown">
+                          PreviewKeyDown="GridItems_PreviewKeyDown"
+                          MouseDoubleClick="GridItems_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Cod. Principal" Binding="{Binding CodigoPrincipal}" Width="120"/>
                             <DataGridTextColumn Header="Cod. Auxiliar" Binding="{Binding CodigoAuxiliar}" Width="110"/>
-                            <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, StringFormat=0.##, ConverterCulture=en-US}" Width="90"/>
+                            <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad, StringFormat=0.###, ConverterCulture=en-US}" Width="90"/>
                             <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -109,14 +110,14 @@
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="P. Unitario" Binding="{Binding PrecioUnitario, StringFormat=0.##, ConverterCulture=en-US}" Width="110"/>
-                            <DataGridTextColumn Header="Desc." Binding="{Binding Descuento, StringFormat=0.##, ConverterCulture=en-US}" Width="80"/>
-                            <DataGridTextColumn Header="P. Unit c/desc" Binding="{Binding PrecioUnitarioConDescuento, StringFormat=0.##, ConverterCulture=en-US}" Width="130"/>
-                            <DataGridTextColumn Header="Subtotal" Binding="{Binding TotalLinea, StringFormat=0.##, ConverterCulture=en-US}" Width="110"/>
+                            <DataGridTextColumn Header="P. Unitario" Binding="{Binding PrecioUnitario, StringFormat=0.000, ConverterCulture=en-US}" Width="110"/>
+                            <DataGridTextColumn Header="Desc." Binding="{Binding DescuentoUnitario, StringFormat=0.000, ConverterCulture=en-US}" Width="80"/>
+                            <DataGridTextColumn Header="P. Unit c/desc" Binding="{Binding PrecioUnitarioConDescuento, StringFormat=0.000, ConverterCulture=en-US}" Width="130"/>
+                            <DataGridTextColumn Header="Subtotal" Binding="{Binding TotalLinea, StringFormat=0.000, ConverterCulture=en-US}" Width="110"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <Border Padding="12" Margin="0,12,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1" Width="462" HorizontalAlignment="Right">
+                    <Border Padding="10" Margin="0,10,0,0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource BorderBrushLight}" BorderThickness="1" Width="462" HorizontalAlignment="Right">
                         <DataGrid x:Name="GridTotals"
                                   AutoGenerateColumns="False"
                                   HeadersVisibility="None"
@@ -133,7 +134,7 @@
                                   GridLinesVisibility="All">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Label}" Width="320"/>
-                                <DataGridTextColumn Binding="{Binding Value, StringFormat=0.##, ConverterCulture=en-US}" Width="110"/>
+                                <DataGridTextColumn Binding="{Binding Value, StringFormat=0.000, ConverterCulture=en-US}" Width="110"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>

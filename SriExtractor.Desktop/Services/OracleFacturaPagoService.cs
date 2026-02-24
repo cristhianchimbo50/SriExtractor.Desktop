@@ -76,6 +76,23 @@ ORDER BY M.CO_NUMERO DESC";
         return list;
     }
 
+    public bool ExisteCompra(string coNumero)
+    {
+        if (string.IsNullOrWhiteSpace(coNumero))
+            return false;
+
+        const string query = "SELECT 1 FROM CP_MOVIM WHERE CO_NUMERO = :coNumero AND ROWNUM = 1";
+
+        using var connection = new OracleConnection(_connectionString);
+        connection.Open();
+
+        using var command = new OracleCommand(query, connection);
+        command.Parameters.Add(new OracleParameter("coNumero", coNumero));
+
+        using var reader = command.ExecuteReader();
+        return reader.Read();
+    }
+
     public List<RetencionDetalleRow> GetRetencionDetalle(string coNumero)
     {
         var list = new List<RetencionDetalleRow>();
@@ -83,32 +100,33 @@ ORDER BY M.CO_NUMERO DESC";
         if (string.IsNullOrWhiteSpace(coNumero))
             return list;
 
-        const string query = @"SELECT
-    C.CO_NUMERO,
-    P.PM_NROSEC,
-    C.CO_SUBTOT,
-    C.CO_IVA,
-    C.CO_TARIFA12,
-    C.CO_TOTAL,
-
-    I.CL_CODIGO,
-    I.IT_CODIGO,
-    I.IT_NOMBRE,
-    D.DC_CANTID,
-    D.DC_COSTO,
-    (D.DC_CANTID * D.DC_COSTO) AS LINEA_SUBTOTAL
-
-FROM IN_COMPRA C,
-     CP_MOVIM M,
-     CP_PAGO P,
-     IN_DETCO  D,
-     IN_ITEM   I
-WHERE C.CO_NUMERO = D.CO_NUMERO
-  AND D.IT_CODIGO = I.IT_CODIGO
-  AND M.CO_NUMERO = C.CO_NUMERO
-  AND P.MP_CODIGO = M.MP_CODIGO
-  AND C.CO_NUMERO = :coNumero
-ORDER BY D.IT_CODIGO";
+        const string query = @"
+            SELECT
+                C.CO_NUMERO,
+                X.PM_NROSEC,
+                C.CO_SUBTOT,
+                C.CO_IVA,
+                C.CO_TARIFA12,
+                C.CO_TOTAL,
+                I.IT_CODANT,
+                I.IT_NOMBRE,
+                D.DC_CANTID,
+                D.DC_COSTO,
+                (D.DC_CANTID * D.DC_COSTO) AS LINEA_SUBTOTAL
+            FROM IN_COMPRA C,
+                 IN_DETCO  D,
+                 IN_ITEM   I,
+                 ( SELECT M.CO_NUMERO,
+                          MAX(P.PM_NROSEC) AS PM_NROSEC
+                     FROM CP_MOVIM M, CP_PAGO P
+                    WHERE P.MP_CODIGO = M.MP_CODIGO
+                    GROUP BY M.CO_NUMERO
+                 ) X
+            WHERE C.CO_NUMERO = D.CO_NUMERO
+              AND D.IT_CODIGO = I.IT_CODIGO
+              AND X.CO_NUMERO(+) = C.CO_NUMERO
+              AND C.CO_NUMERO = :coNumero
+            ORDER BY D.IT_CODIGO";
 
         using var connection = new OracleConnection(_connectionString);
         connection.Open();
@@ -120,16 +138,13 @@ ORDER BY D.IT_CODIGO";
 
         while (reader.Read())
         {
-            var itCodigo = reader["IT_CODIGO"]?.ToString()?.Trim() ?? "";
-            var clCodigo = reader["CL_CODIGO"]?.ToString()?.Trim() ?? "";
+            var itCodAnt = reader["IT_CODANT"]?.ToString()?.Trim() ?? "";
 
             list.Add(new RetencionDetalleRow
             {
                 CoNumero = reader["CO_NUMERO"]?.ToString()?.Trim() ?? "",
                 PmNrosec = reader["PM_NROSEC"]?.ToString()?.Trim() ?? "",
-                ClCodigo = clCodigo,
-                ItCodigo = itCodigo,
-                CodigoProducto = itCodigo,
+                ItCodAnt = itCodAnt,
                 Producto = reader["IT_NOMBRE"]?.ToString()?.Trim() ?? "",
                 Cantidad = GetDecimal(reader, "DC_CANTID"),
                 CostoUnitario = GetDecimal(reader, "DC_COSTO"),

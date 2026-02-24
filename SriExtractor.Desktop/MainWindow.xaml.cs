@@ -26,7 +26,6 @@ public partial class MainWindow : Window
         LoadFechasExtraidas();
     }
 
-
     private void BtnView_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button btn) return;
@@ -70,7 +69,7 @@ public partial class MainWindow : Window
             var now = DateTime.Now;
 
             var years = Directory.GetDirectories(baseFolder)
-                .OrderBy(y => y)
+                .OrderByDescending(y => y)
                 .ToList();
 
             foreach (var yearDir in years)
@@ -79,9 +78,8 @@ public partial class MainWindow : Window
                 var yearItem = new TreeViewItem { Header = yearName };
 
                 var monthDirs = Directory.GetDirectories(yearDir)
-                    .OrderBy(m => m)
                     .Select(m => new { Path = m, Order = ParseMonthPrefix(Path.GetFileName(m)) })
-                    .OrderBy(x => x.Order)
+                    .OrderByDescending(x => x.Order)
                     .ToList();
 
                 foreach (var monthDir in monthDirs)
@@ -90,24 +88,29 @@ public partial class MainWindow : Window
                     var monthItem = new TreeViewItem { Header = monthName };
 
                     var dayDirs = Directory.GetDirectories(monthDir.Path)
-                        .Select(d => new
+                        .Select(d =>
                         {
-                            Path = d,
-                            Date = DateTime.TryParseExact(Path.GetFileName(d), "dd-MM-yyyy", culture, DateTimeStyles.None, out var dt) ? dt : (DateTime?)null
+                            var folderName = Path.GetFileName(d);
+                            var ok = DateTime.TryParseExact(folderName, "dd-MM-yyyy", culture, DateTimeStyles.None, out var dt);
+                            return new { Path = d, Date = ok ? dt : (DateTime?)null };
                         })
-                        .OrderBy(d => d.Date ?? DateTime.MaxValue)
+                        .OrderByDescending(d => d.Date ?? DateTime.MinValue)
                         .ToList();
 
                     foreach (var dayDir in dayDirs)
                     {
-                        var dayName = Path.GetFileName(dayDir.Path);
-                        var display = dayName;
+                        var folderName = Path.GetFileName(dayDir.Path);
 
-                        if (dayDir.Date != null)
+                        if (dayDir.Date == null)
                         {
-                            var dow = culture.DateTimeFormat.GetDayName(dayDir.Date.Value.DayOfWeek).ToUpperInvariant();
-                            display = $"{dayName} {dow}";
+                            monthItem.Items.Add(new TreeViewItem { Header = folderName, Tag = dayDir.Path });
+                            continue;
                         }
+
+                        var dt = dayDir.Date.Value;
+                        var fecha = dt.ToString("dd/MM/yyyy", culture);
+                        var dow = culture.DateTimeFormat.GetDayName(dt.DayOfWeek).ToUpperInvariant();
+                        var display = $"{fecha} {dow}";
 
                         monthItem.Items.Add(new TreeViewItem { Header = display, Tag = dayDir.Path });
                     }

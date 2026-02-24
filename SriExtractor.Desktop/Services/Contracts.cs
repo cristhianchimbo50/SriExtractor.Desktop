@@ -13,6 +13,7 @@ public interface IOracleFacturaPagoService
 {
     List<FacturaPagoRow> GetFacturasPago();
     List<RetencionDetalleRow> GetRetencionDetalle(string coNumero);
+    bool ExisteCompra(string coNumero);
 }
 
 public interface ISriRecibidosService
